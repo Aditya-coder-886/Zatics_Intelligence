@@ -13,11 +13,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 30) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 30);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -34,7 +30,6 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/10 group-hover:scale-105 transition-transform">
             <Zap className="w-4 h-4 text-white fill-white/10" />
@@ -44,7 +39,6 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
@@ -57,17 +51,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* CTA Button */}
         <div className="hidden md:flex items-center gap-4">
-          <Link
-            href="#contact"
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              "text-muted-foreground hover:text-white cursor-pointer"
-            )}
-          >
-            Contact Sales
-          </Link>
           <a
             href={bookingUrl}
             target="_blank"
@@ -77,16 +61,15 @@ export default function Navbar() {
               "bg-indigo-600 hover:bg-indigo-500 text-white font-medium border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] rounded-lg transition-all flex items-center gap-1 cursor-pointer"
             )}
           >
-            Book a Demo
+            Book a Call
             <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
         </div>
 
-        {/* Mobile menu button */}
         <div className="md:hidden flex items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="text-muted-foreground hover:text-white p-1"
+            className="text-muted-foreground hover:text-white p-1 cursor-pointer"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -94,7 +77,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 top-[57px] z-40 bg-background/95 backdrop-blur-md md:hidden animate-fade-in flex flex-col justify-between p-6">
           <nav className="flex flex-col gap-6 pt-8">
@@ -111,16 +93,6 @@ export default function Navbar() {
           </nav>
 
           <div className="flex flex-col gap-4 pb-12">
-            <Link
-              href="#contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "w-full border-white/10 text-foreground text-center"
-              )}
-            >
-              Contact Sales
-            </Link>
             <a
               href={bookingUrl}
               target="_blank"
@@ -131,7 +103,7 @@ export default function Navbar() {
                 "w-full bg-indigo-600 hover:bg-indigo-500 text-white text-center flex items-center justify-center gap-1"
               )}
             >
-              Book a Demo
+              Book a Call
               <ArrowUpRight className="w-4 h-4" />
             </a>
           </div>

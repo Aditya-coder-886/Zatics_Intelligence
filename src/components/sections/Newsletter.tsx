@@ -39,7 +39,7 @@ export default function Newsletter() {
         setStatus("error");
         setErrorMessage(result.error || "Subscription failed. Please try again.");
       }
-    } catch (error) {
+    } catch {
       setStatus("error");
       setErrorMessage("Connection error. Please try again later.");
     }
@@ -47,31 +47,28 @@ export default function Newsletter() {
 
   return (
     <section className="py-20 bg-background border-t border-white/5 relative overflow-hidden z-10">
-      {/* Background glow spot */}
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-indigo-500/2 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white/2 border border-white/5 rounded-2xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
-          
-          {/* Text Info */}
+        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
           <div className="lg:col-span-6">
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2">
-              Stay ahead of what's next.
+              Stay ahead of what&apos;s next.
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
-              Receive periodic briefings covering enterprise AI design patterns, autonomous agent developments, and unified data architectures.
+              AI is moving fast. Get occasional insights on AI systems, automation,
+              infrastructure, and what&apos;s actually working in production.
             </p>
           </div>
 
-          {/* Form */}
           <div className="lg:col-span-6 w-full">
             {status === "success" ? (
               <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-400 animate-fade-in">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <div className="text-sm">
-                  <span className="font-semibold block">Subscription Active</span>
+                  <span className="font-semibold block">You&apos;re subscribed</span>
                   <span className="text-xs text-emerald-400/80">
-                    We've registered your work email address for upcoming briefs.
+                    Check your inbox for a confirmation email.
                   </span>
                 </div>
               </div>
@@ -91,12 +88,12 @@ export default function Newsletter() {
                 <Button
                   type="submit"
                   disabled={status === "loading"}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-6 px-8 rounded-xl text-sm transition-all flex items-center justify-center gap-2"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-6 px-8 rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {status === "loading" ? (
                     <Loader2 className="w-4.5 h-4.5 animate-spin" />
                   ) : (
-                    "Subscribe"
+                    "Subscribe →"
                   )}
                 </Button>
               </form>
@@ -109,7 +106,6 @@ export default function Newsletter() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </section>

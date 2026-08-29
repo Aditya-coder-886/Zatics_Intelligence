@@ -7,42 +7,38 @@ export interface FAQItem {
 export const faqData: FAQItem[] = [
   {
     id: "faq-1",
-    question: "What is Zatics Intelligence?",
-    answer: "Zatics Intelligence is an enterprise-grade AI agency and technology provider. We build and deploy intelligent automation layers, custom AI agents, and semantic data systems designed to automate workflows and optimize strategic decisions."
+    question: "What does Zatics Intelligence build?",
+    answer:
+      "We build custom AI systems including automation platforms, multi-agent architectures, AI infrastructure, voice AI, RAG systems, integrations, and AI-powered products.",
   },
   {
     id: "faq-2",
-    question: "What types of AI systems can Zatics build?",
-    answer: "We specialize in autonomous AI agents, intelligent workflow automation, RAG/semantic search indexing, predictive decision systems, and custom machine learning pipelines integrated directly into your existing infrastructure."
+    question: "Do you work with existing software?",
+    answer:
+      "Yes. We integrate AI into the systems your business already uses rather than forcing you to replace your entire stack.",
   },
   {
     id: "faq-3",
-    question: "Can Zatics integrate with existing systems?",
-    answer: "Yes. All our AI solutions are built to integrate seamlessly with your existing stack via REST APIs, database connectors, and secure webhooks. We support legacy setups, ERPs, CRM platforms, and standard cloud architectures."
+    question: "Can you build something completely custom?",
+    answer:
+      "Yes. Our systems are designed around the specific workflow, data, infrastructure, and objectives of each business.",
   },
   {
     id: "faq-4",
-    question: "How does implementation work?",
-    answer: "Our implementation follows a structured 4-step timeline: Understand (discovery & auditing), Connect (integrating data sources & systems), Intelligence (applying models & custom layers), and Optimize (ongoing analytics & tuning to ensure business metrics are met)."
+    question: "How long does an implementation take?",
+    answer:
+      "It depends on the complexity of the system. After the initial discovery, we'll define the architecture, scope, and implementation timeline.",
   },
   {
     id: "faq-5",
-    question: "Is the platform suitable for enterprises?",
-    answer: "Absolutely. Security is our priority. We construct our systems with private cloud VPC hosting options, data isolation models, SOC2-compliant design patterns, role-based access control, and guarantee a 99.9% uptime SLA."
+    question: "Do you provide ongoing support?",
+    answer:
+      "Yes. We can continue optimizing, maintaining, and expanding your AI infrastructure after deployment.",
   },
   {
     id: "faq-6",
-    question: "Can Zatics build custom AI solutions?",
-    answer: "Yes, custom AI is a core pillar. We evaluate your unique dataset and business challenges, select and train the best base models (e.g., custom fine-tuning, retrieval setups), and deploy bespoke solutions tailored specifically to your operations."
+    question: "How much does it cost?",
+    answer:
+      "Projects vary based on complexity, integrations, infrastructure, and ongoing requirements. We'll scope the appropriate solution after understanding your requirements.",
   },
-  {
-    id: "faq-7",
-    question: "How long does implementation take?",
-    answer: "Typical discovery and design take 1-2 weeks. Basic workflow systems can be deployed within 4-6 weeks, while highly complex, custom multi-agent enterprise setups may take 8-12 weeks from alignment to deployment."
-  },
-  {
-    id: "faq-8",
-    question: "How do we get started?",
-    answer: "Simply book a demo through our calendar scheduling link or submit an inquiry using our contact form. Our technical team will coordinate an initial discovery workshop to understand your objectives."
-  }
 ];

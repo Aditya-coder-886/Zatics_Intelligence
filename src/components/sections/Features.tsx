@@ -7,112 +7,98 @@ import { featuresData } from "@/data/features";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
-import AIActivityTimeline from "@/components/visuals/AIActivityTimeline";
-import WorkflowGraph from "@/components/visuals/WorkflowGraph";
-import DataVisual from "@/components/visuals/DataVisual";
-import DecisionEngine from "@/components/visuals/DecisionEngine";
+import * as Icons from "lucide-react";
 
 export default function Features() {
-  const getVisual = (type: string) => {
-    switch (type) {
-      case "agents":
-        return <AIActivityTimeline />;
-      case "automation":
-        return <WorkflowGraph />;
-      case "data":
-        return <DataVisual />;
-      case "decision":
-        return <DecisionEngine />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <section id="features" className="py-24 bg-background relative overflow-hidden z-10 space-y-32">
-      {/* Light background nodes */}
+    <section id="solutions" className="py-24 bg-background relative overflow-hidden z-10">
       <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-indigo-500/3 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-2/3 right-1/4 w-[400px] h-[400px] bg-blue-500/3 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Section Header */}
-        <div className="max-w-3xl mb-24">
-          <h2 className="text-xs uppercase font-mono tracking-widest text-indigo-400 mb-3">
-            Platform Features
-          </h2>
-          <h3 className="text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight font-sans">
-            Integrated intelligence. <br />
-            Built for execution.
-          </h3>
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="text-xs uppercase font-mono tracking-widest text-indigo-400 mb-3"
+          >
+            What We Build
+          </motion.h2>
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight"
+          >
+            AI that actually does the work.
+          </motion.h3>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-sm sm:text-base text-muted-foreground mt-4 leading-relaxed"
+          >
+            Forget another chatbot sitting on your website. We build systems
+            that think, connect, execute, and improve.
+          </motion.p>
         </div>
 
-        {/* Feature Sections alternating */}
-        <div className="space-y-32">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {featuresData.map((feature, idx) => {
-            const isEven = idx % 2 === 0;
+            const IconComponent = (Icons as any)[feature.iconName] || Icons.Cpu;
 
             return (
-              <div
+              <motion.div
                 key={feature.id}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                className="relative group p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-indigo-500/30 transition-all duration-300 flex flex-col h-full overflow-hidden"
               >
-                {/* Text Content */}
-                <motion.div
-                  initial={{ opacity: 0, x: isEven ? -40 : 40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.7 }}
-                  className={`lg:col-span-5 flex flex-col items-start ${
-                    isEven ? "lg:order-1" : "lg:order-2"
-                  }`}
-                >
-                  {/* Number & Category */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="text-sm font-mono text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">
-                      {feature.number}
-                    </span>
-                    <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
-                      {feature.category}
-                    </span>
+                <div className="absolute inset-0 bg-[radial-gradient(400px_circle_at_var(--mouse-x,0px)_var(--mouse-y,0px),rgba(99,102,241,0.06),transparent_50%)] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                    <IconComponent className="w-5 h-5" />
                   </div>
+                  <Icons.ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
+                </div>
 
-                  {/* Heading */}
-                  <h4 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight mb-5 font-sans">
-                    {feature.title}
-                  </h4>
+                <h4 className="text-base font-semibold text-white mb-2 group-hover:text-indigo-300 transition-colors">
+                  {feature.title}
+                </h4>
 
-                  {/* Description */}
-                  <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-8">
-                    {feature.description}
-                  </p>
-
-                  {/* CTA */}
-                  <Link
-                    href={feature.ctaHref}
-                    className={cn(
-                      buttonVariants({ variant: "ghost" }),
-                      "p-0 text-indigo-400 hover:text-indigo-300 bg-transparent hover:bg-transparent flex items-center gap-2 group font-medium cursor-pointer"
-                    )}
-                  >
-                    {feature.ctaText}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </motion.div>
-
-                {/* Visual Panel */}
-                <motion.div
-                  initial={{ opacity: 0, x: isEven ? 40 : -40 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.7 }}
-                  className={`lg:col-span-7 ${isEven ? "lg:order-2" : "lg:order-1"}`}
-                >
-                  {getVisual(feature.visualType)}
-                </motion.div>
-              </div>
+                <p className="text-xs text-muted-foreground leading-relaxed flex-1">
+                  {feature.description}
+                </p>
+              </motion.div>
             );
           })}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mt-12"
+        >
+          <Link
+            href="#contact"
+            className={cn(
+              buttonVariants({ variant: "ghost" }),
+              "text-indigo-400 hover:text-indigo-300 bg-transparent hover:bg-transparent inline-flex items-center gap-2 group font-medium cursor-pointer"
+            )}
+          >
+            Explore Our Capabilities
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

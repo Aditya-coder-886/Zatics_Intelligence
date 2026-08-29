@@ -19,20 +19,21 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://zatics.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Zatics Intelligence — AI-Powered Intelligence & Automation",
+    default: "Zatics Intelligence — AI Infrastructure & Automation",
     template: "%s | Zatics Intelligence",
   },
   description:
-    "Zatics Intelligence helps businesses turn data, workflows, and complex decisions into intelligent action through AI-powered systems and automation.",
+    "We design and deploy production-ready AI systems that automate operations, connect your technology, and scale intelligent workflows.",
   keywords: [
-    "AI Intelligence",
+    "AI Infrastructure",
+    "AI Automation",
+    "Multi-Agent Systems",
+    "Voice AI",
+    "Custom AI",
+    "AI Systems",
     "Business Automation",
     "Enterprise AI",
-    "AI Agents",
-    "Decision Intelligence",
-    "Data Intelligence",
-    "Intelligent Automation",
-    "Zatics",
+    "Zatics Intelligence",
   ],
   authors: [{ name: "Zatics Intelligence" }],
   creator: "Zatics Intelligence",
@@ -41,9 +42,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteUrl,
     siteName: "Zatics Intelligence",
-    title: "Zatics Intelligence — AI-Powered Intelligence & Automation",
+    title: "Zatics Intelligence — AI Infrastructure & Automation",
     description:
-      "Transform data, workflows, and complex decisions into intelligent action through AI-powered systems and automation.",
+      "Production-ready AI systems that automate operations, connect technology, and scale intelligent workflows.",
     images: [
       {
         url: `${siteUrl}/og-image.png`,
@@ -55,9 +56,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zatics Intelligence — AI-Powered Intelligence & Automation",
+    title: "Zatics Intelligence — AI Infrastructure & Automation",
     description:
-      "Transform data, workflows, and complex decisions into intelligent action through AI-powered systems and automation.",
+      "Production-ready AI systems that automate operations, connect technology, and scale intelligent workflows.",
     images: [`${siteUrl}/og-image.png`],
     creator: "@ZaticsAI",
   },
