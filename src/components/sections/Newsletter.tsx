@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Loader2, Mail, CheckCircle2, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
+import { Loader2, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
 
 export default function Newsletter() {
@@ -15,7 +14,7 @@ export default function Newsletter() {
     e.preventDefault();
     if (!email || !email.includes("@")) {
       setStatus("error");
-      setErrorMessage("Please enter a valid work email address.");
+      setErrorMessage("Please enter a valid email address.");
       return;
     }
 
@@ -46,24 +45,30 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="py-20 bg-background border-t border-white/5 relative overflow-hidden z-10">
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-indigo-500/2 blur-[100px] rounded-full pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative overflow-hidden">
-          <div className="lg:col-span-6">
+    <section className="py-24 sm:py-28 bg-background relative overflow-hidden z-10 border-t border-zinc-900">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
+        >
+          {/* Left: Text */}
+          <div className="lg:col-span-5">
             <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white mb-2">
               Stay ahead of what&apos;s next.
             </h3>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-md">
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-md">
               AI is moving fast. Get occasional insights on AI systems, automation,
               infrastructure, and what&apos;s actually working in production.
             </p>
           </div>
 
-          <div className="lg:col-span-6 w-full">
+          {/* Right: Form */}
+          <div className="lg:col-span-7 w-full">
             {status === "success" ? (
-              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-400 animate-fade-in">
+              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl text-emerald-400">
                 <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
                 <div className="text-sm">
                   <span className="font-semibold block">You&apos;re subscribed</span>
@@ -75,27 +80,29 @@ export default function Newsletter() {
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 relative">
-                  <Mail className="absolute left-3.5 top-3.5 w-4.5 h-4.5 text-muted-foreground" />
-                  <Input
+                  <input
                     type="email"
-                    placeholder="Enter your work email"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={status === "loading"}
-                    className="w-full bg-black/30 border-white/5 focus:border-indigo-500 text-white rounded-xl py-6 pl-11 pr-4 text-sm"
+                    className="w-full bg-white/[0.03] border border-zinc-800 focus:border-indigo-500/60 text-white text-sm rounded-xl px-5 py-3.5 outline-none transition-colors duration-200 placeholder:text-zinc-600 disabled:opacity-50"
                   />
                 </div>
-                <Button
+                <button
                   type="submit"
                   disabled={status === "loading"}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-6 px-8 rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/30 transition-all duration-300 hover:shadow-[0_0_20px_rgba(99,102,241,0.25)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
                   {status === "loading" ? (
-                    <Loader2 className="w-4.5 h-4.5 animate-spin" />
+                    <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    "Subscribe →"
+                    <>
+                      Subscribe
+                      <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </>
                   )}
-                </Button>
+                </button>
               </form>
             )}
 
@@ -106,7 +113,7 @@ export default function Newsletter() {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

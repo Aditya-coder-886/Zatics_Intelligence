@@ -1,208 +1,122 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { caseStudiesData, pricingTiers } from "@/data/caseStudies";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ArrowRight, ArrowUpRight, Check, Star } from "lucide-react";
+import { motion } from "framer-motion";
+import { caseStudiesData } from "@/data/caseStudies";
+import { ArrowRight } from "lucide-react";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+};
 
 export default function CaseStudies() {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-
   return (
-    <section id="work" className="py-24 bg-background relative overflow-hidden z-10">
-      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-indigo-500/3 blur-[120px] rounded-full pointer-events-none" />
+    <section id="work" className="py-24 sm:py-32 bg-background relative overflow-hidden z-10">
+      {/* Ambient glows */}
+      <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-indigo-500/[0.03] blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/3 w-[350px] h-[350px] bg-emerald-500/[0.02] blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Case Studies */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-xs uppercase font-mono tracking-widest text-indigo-400 mb-3"
-          >
-            Case Studies
-          </motion.h2>
-          <motion.h3
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.05 }}
-            className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight"
+            transition={{ duration: 0.7 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white leading-[1.12]"
           >
             Built for the real world.
-          </motion.h3>
+          </motion.h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {caseStudiesData.map((cs, idx) => (
-            <motion.div
-              key={cs.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="relative group"
-            >
-              <button
-                onClick={() => setExpandedId(expandedId === cs.id ? null : cs.id)}
-                className="w-full text-left p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-indigo-500/30 transition-all duration-300 cursor-pointer"
+        {/* Case Study Cards */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={stagger}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+        >
+          {caseStudiesData.map((cs) => (
+            <motion.div key={cs.id} variants={fadeUp}>
+              <div className="group relative h-full p-6 sm:p-7 rounded-2xl bg-zinc-900/50 border border-zinc-800/60 transition-all duration-400 ease-out hover:translate-y-[-4px] hover:border-transparent overflow-hidden"
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "rgba(16,185,129,0.3)";
+                  el.style.boxShadow = "0 0 40px rgba(16,185,129,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "";
+                  el.style.boxShadow = "";
+                }}
               >
                 {/* Industry tag */}
-                <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-wider">
+                <span className="inline-block text-[10px] font-mono text-emerald-400/70 uppercase tracking-wider mb-4 px-2 py-0.5 rounded bg-emerald-500/[0.08] border border-emerald-500/15">
                   {cs.industry}
                 </span>
 
-                {/* Metrics - lead with numbers */}
-                <div className="flex flex-wrap gap-3 mt-4 mb-4">
-                  {cs.metrics.map((metric) => (
-                    <div key={metric.label} className="flex items-baseline gap-1">
-                      <span className="text-xl font-bold text-white font-mono">{metric.value}</span>
-                      <span className="text-[10px] text-muted-foreground">{metric.label}</span>
-                    </div>
-                  ))}
+                {/* Project title */}
+                <h3 className="text-base sm:text-lg font-semibold text-white mb-2 leading-snug">
+                  {cs.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-5">
+                  {cs.description}
+                </p>
+
+                {/* Metrics — the visual highlight */}
+                <div className="mt-auto pt-5 border-t border-white/[0.05]">
+                  <div className="flex flex-wrap gap-x-4 gap-y-2">
+                    {cs.metrics.map((metric) => (
+                      <div key={metric.label} className="flex items-baseline gap-1.5">
+                        <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-400 group-hover:text-emerald-300 transition-colors duration-300">
+                          {metric.value}
+                        </span>
+                        <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-wide">
+                          {metric.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Title */}
-                <h4 className="text-base font-semibold text-white mb-2">{cs.title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">{cs.description}</p>
-
-                {/* Expand indicator */}
-                <div className="mt-4 flex items-center gap-1 text-xs text-indigo-400">
-                  <span>{expandedId === cs.id ? "Show less" : "Read more"}</span>
-                  <ArrowUpRight className={`w-3 h-3 transition-transform ${expandedId === cs.id ? "rotate-90" : ""}`} />
-                </div>
-              </button>
-
-              {/* Expanded content */}
-              <AnimatePresence>
-                {expandedId === cs.id && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-6 pt-2">
-                      {cs.testimonial && (
-                        <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-                          <p className="text-sm text-indigo-200 italic mb-2">
-                            &ldquo;{cs.testimonial.quote}&rdquo;
-                          </p>
-                          <p className="text-xs text-indigo-400">
-                            — {cs.testimonial.author}, {cs.testimonial.role}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                {/* Glow accent on hover — behind metrics */}
+                <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-emerald-500/[0.04] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
+        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-24"
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center"
         >
           <Link
             href="#contact"
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "text-indigo-400 hover:text-indigo-300 bg-transparent hover:bg-transparent inline-flex items-center gap-2 group font-medium cursor-pointer"
-            )}
+            className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-base font-medium text-white/70 hover:text-white border border-white/10 hover:border-emerald-500/30 bg-white/[0.02] hover:bg-emerald-500/[0.04] transition-all duration-300 cursor-pointer"
           >
             View All Work
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5" />
           </Link>
         </motion.div>
-
-        {/* Pricing Tiers */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <motion.h3
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="text-3xl sm:text-4xl font-bold tracking-tight text-white leading-tight"
-          >
-            Transparent pricing.
-          </motion.h3>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-sm sm:text-base text-muted-foreground mt-4 leading-relaxed"
-          >
-            Every project is different. Here&apos;s how we scope engagement.
-          </motion.p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {pricingTiers.map((tier, idx) => (
-            <motion.div
-              key={tier.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className={cn(
-                "relative p-8 rounded-2xl border flex flex-col transition-all duration-300",
-                tier.isPopular
-                  ? "border-indigo-500/35 bg-gradient-to-b from-indigo-500/5 to-transparent shadow-[0_0_30px_rgba(99,102,241,0.15)]"
-                  : "border-white/5 bg-white/[0.02] hover:border-white/10"
-              )}
-            >
-              {tier.isPopular && (
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 text-[9px] uppercase font-mono font-bold tracking-wider bg-indigo-500 text-white px-3 py-1 rounded-full shadow-[0_0_12px_rgba(99,102,241,0.5)]">
-                  Most Common
-                </span>
-              )}
-
-              <div>
-                <h4 className="text-lg font-bold text-white mb-1">{tier.name}</h4>
-                <p className="text-2xl font-bold text-indigo-400 font-mono mb-2">{tier.priceRange}</p>
-                <p className="text-xs text-muted-foreground mb-6">{tier.description}</p>
-
-                <div className="h-[1px] bg-white/5 w-full mb-6" />
-
-                <ul className="space-y-3 mb-8">
-                  {tier.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5">
-                      <Check className="w-3.5 h-3.5 text-indigo-400 mt-0.5 flex-shrink-0" />
-                      <span className="text-xs text-muted-foreground leading-tight">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <Link
-                href="#contact"
-                className={cn(
-                  buttonVariants({
-                    variant: tier.isPopular ? "default" : "outline",
-                  }),
-                  "w-full text-center py-2.5 rounded-lg text-xs font-medium cursor-pointer mt-auto",
-                  tier.isPopular
-                    ? "bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.2)]"
-                    : "border-white/10 hover:border-white/20 text-white bg-transparent"
-                )}
-              >
-                Get Started
-              </Link>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </section>
   );

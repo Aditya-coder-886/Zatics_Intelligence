@@ -1,70 +1,98 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Contact() {
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "https://calendly.com";
+  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "#contact";
 
   return (
-    <section id="contact" className="py-24 bg-background relative overflow-hidden z-10 border-t border-white/5">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/3 blur-[140px] rounded-full pointer-events-none" />
+    <section
+      id="contact"
+      className="relative min-h-[85vh] flex items-center justify-center overflow-hidden z-10"
+    >
+      {/* Deep radial gradient background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.06)_0%,rgba(0,0,0,0)_60%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(59,130,246,0.04)_0%,rgba(0,0,0,0)_50%)]" />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.1] mb-4"
-        >
-          Let&apos;s build what&apos;s next.
-        </motion.h2>
+      {/* Subtle noise overlay */}
+      <div className="absolute inset-0 opacity-[0.015] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWx0ZXI9InVybCgjYSkiIG9wYWNpdHk9IjEiLz48L3N2Zz4=')] pointer-events-none" />
 
+      {/* Ambient glow orbs */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-indigo-500/[0.05] blur-[160px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-blue-500/[0.03] blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-32">
+        {/* Contrasting Headlines */}
+        <div className="mb-10">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.7 }}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-zinc-500 leading-[1.15] mb-3"
+          >
+            You could keep doing it manually.
+          </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-[1.15]"
+          >
+            <span className="bg-gradient-to-r from-white via-blue-100 to-cyan-300 bg-clip-text text-transparent">
+              Or you could build the system.
+            </span>
+          </motion.p>
+        </div>
+
+        {/* Urgency Paragraph */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-10 max-w-lg mx-auto"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="text-sm sm:text-base md:text-lg text-zinc-400 leading-relaxed max-w-2xl mx-auto mb-12"
         >
-          Tell us what you&apos;re trying to automate, build, or scale.
+          Your competitors are already figuring out how AI fits into their
+          operations. The question isn&apos;t whether AI will change your business.
+          It&apos;s whether you&apos;ll build the advantage before they do.
         </motion.p>
 
+        {/* Primary CTA Button — The Focal Point */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          transition={{ duration: 0.7, delay: 0.55 }}
+          className="mb-6"
         >
           <a
             href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "w-full sm:w-auto bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-8 py-6 rounded-xl border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.25)] transition-all flex items-center justify-center gap-2 group text-base cursor-pointer"
-            )}
+            className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 sm:px-12 sm:py-6 rounded-2xl text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-all duration-300 hover:scale-[1.04] active:scale-[0.98] shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)] cursor-pointer"
           >
-            Book a Strategy Call
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            Build Your AI System
+            <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" />
+
+            {/* Pulsing glow ring on hover */}
+            <span className="absolute inset-0 rounded-2xl bg-indigo-400/0 group-hover:bg-indigo-400/5 transition-colors duration-300" />
+            <span className="absolute -inset-1 rounded-2xl bg-indigo-500/0 group-hover:bg-indigo-500/10 blur-xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
           </a>
-          <Link
-            href="mailto:hello@zatics.com"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "w-full sm:w-auto border-white/10 hover:border-white/20 bg-white/[0.02] hover:bg-white/5 text-white font-medium px-8 py-6 rounded-xl transition-all text-base flex items-center justify-center gap-2 cursor-pointer"
-            )}
-          >
-            <Mail className="w-4 h-4" />
-            Contact Engineering
-          </Link>
         </motion.div>
+
+        {/* Supporting Footer Line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.7 }}
+          className="text-xs sm:text-sm font-mono text-zinc-600 tracking-wide"
+        >
+          Tell us what you&apos;re trying to automate, build, or scale.
+        </motion.p>
       </div>
     </section>
   );
