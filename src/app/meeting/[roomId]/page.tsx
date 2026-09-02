@@ -4,10 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, MessageCircle, Video, Mic, Users, X, Mail, CheckCircle2, Loader2, Calendar, Clock, Zap, BarChart3, FileText, Send } from "lucide-react";
-import { clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-const cn = (...inputs: string[]) => twMerge(clsx(inputs));
+import { cn } from "@/lib/utils";
 
 type MessageType = 'user' | 'system' | 'automation';
 
@@ -124,9 +121,10 @@ export default function MeetingRoom() {
     return () => clearInterval(interval);
   }, [automationRunning]);
 
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const input = e.target.elements.messageInput as HTMLInputElement;
+    const input = e.currentTarget.elements.namedItem("messageInput");
+    if (!(input instanceof HTMLInputElement)) return;
     const text = input.value.trim();
     if (text) {
       setMessages(prev => [...prev, { id: Date.now(), text, type: 'user' }]);
