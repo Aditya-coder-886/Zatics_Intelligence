@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowDown } from "lucide-react";
 import HeroNetwork from "@/components/visuals/HeroNetwork";
@@ -33,6 +34,7 @@ const tags = [
 
 export default function Hero() {
   const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "#contact";
+  const router = useRouter();
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden z-10 bg-background">
@@ -79,8 +81,8 @@ export default function Hero() {
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
             {/* Primary CTA */}
-            <a
-              href={bookingUrl}
+            <button
+              onClick={() => router.push('/setup-meeting')}
               className={cn(
                 "relative group inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-xl text-base font-medium text-white transition-all duration-300",
                 "bg-indigo-600 hover:bg-indigo-500",
@@ -94,7 +96,7 @@ export default function Hero() {
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5" />
               {/* Glow ring on hover */}
               <span className="absolute inset-0 rounded-xl bg-indigo-400/0 group-hover:bg-indigo-400/5 transition-colors duration-300" />
-            </a>
+            </button>
 
             {/* Secondary CTA */}
             <Link
