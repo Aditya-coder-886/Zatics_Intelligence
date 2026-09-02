@@ -3,10 +3,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { BookACallButton } from "@/components/booking/BookACallButton";
 
 export default function Contact() {
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "#contact";
-
   return (
     <section
       id="contact"
@@ -70,17 +69,14 @@ export default function Contact() {
           transition={{ duration: 0.7, delay: 0.55 }}
           className="mb-6"
         >
-          <a
-            href={bookingUrl}
-            className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 sm:px-12 sm:py-6 rounded-2xl text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-all duration-300 hover:scale-[1.04] active:scale-[0.98] shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)] cursor-pointer"
-          >
+          <BookACallButton className="group relative inline-flex items-center justify-center gap-3 px-10 py-5 sm:px-12 sm:py-6 rounded-2xl text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-all duration-300 hover:scale-[1.04] active:scale-[0.98] shadow-[0_0_30px_rgba(99,102,241,0.3)] hover:shadow-[0_0_50px_rgba(99,102,241,0.5)] cursor-pointer">
             Build Your AI System
             <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1.5" />
 
             {/* Pulsing glow ring on hover */}
             <span className="absolute inset-0 rounded-2xl bg-indigo-400/0 group-hover:bg-indigo-400/5 transition-colors duration-300" />
             <span className="absolute -inset-1 rounded-2xl bg-indigo-500/0 group-hover:bg-indigo-500/10 blur-xl transition-all duration-500 opacity-0 group-hover:opacity-100" />
-          </a>
+          </BookACallButton>
         </motion.div>
 
         {/* Supporting Footer Line */}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { BookingProvider } from "@/components/booking/BookingProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -88,7 +89,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground">
-        {children}
+        <BookingProvider>{children}</BookingProvider>
       </body>
     </html>
   );

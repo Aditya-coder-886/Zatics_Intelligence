@@ -33,7 +33,6 @@ const tags = [
 ];
 
 export default function Hero() {
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "#contact";
   const router = useRouter();
 
   return (

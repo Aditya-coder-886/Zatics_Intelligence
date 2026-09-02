@@ -3,6 +3,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Calendar, ArrowRight } from "lucide-react";
+import { BookACallButton } from "@/components/booking/BookACallButton";
 
 function getNextBusinessDay(): string {
   const now = new Date();
@@ -24,7 +25,6 @@ function getMonthLabel(): string {
 }
 
 export default function Availability() {
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "https://calendly.com";
   const monthLabel = getMonthLabel();
   const nextDate = getNextBusinessDay();
   const totalSlots = 4;
@@ -128,15 +128,10 @@ export default function Availability() {
               </div>
 
               {/* CTA Button */}
-              <a
-                href={bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
-              >
+              <BookACallButton className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:shadow-[0_0_40px_rgba(99,102,241,0.4)] transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] cursor-pointer">
                 Reserve a Call
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1.5" />
-              </a>
+              </BookACallButton>
             </div>
           </div>
         </motion.div>

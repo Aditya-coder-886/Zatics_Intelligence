@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X, ArrowUpRight, Zap } from "lucide-react";
 import { navLinks } from "@/data/navigation";
 import { buttonVariants } from "@/components/ui/button";
+import { BookACallButton } from "@/components/booking/BookACallButton";
 import { cn } from "@/lib/utils";
 
 export default function Navbar() {
@@ -18,8 +19,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL || "https://calendly.com";
 
   return (
     <header
@@ -52,10 +51,7 @@ export default function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
-          <a
-            href={bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <BookACallButton
             className={cn(
               buttonVariants({ size: "sm" }),
               "bg-indigo-600 hover:bg-indigo-500 text-white font-medium border border-indigo-500/30 shadow-[0_0_15px_rgba(99,102,241,0.2)] rounded-lg transition-all flex items-center gap-1 cursor-pointer"
@@ -63,7 +59,7 @@ export default function Navbar() {
           >
             Book a Call
             <ArrowUpRight className="w-3.5 h-3.5" />
-          </a>
+          </BookACallButton>
         </div>
 
         <div className="md:hidden flex items-center">
@@ -93,11 +89,8 @@ export default function Navbar() {
           </nav>
 
           <div className="flex flex-col gap-4 pb-12">
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
+            <BookACallButton
+              closeMobileMenu={() => setMobileMenuOpen(false)}
               className={cn(
                 buttonVariants({ variant: "default" }),
                 "w-full bg-indigo-600 hover:bg-indigo-500 text-white text-center flex items-center justify-center gap-1"
@@ -105,7 +98,7 @@ export default function Navbar() {
             >
               Book a Call
               <ArrowUpRight className="w-4 h-4" />
-            </a>
+            </BookACallButton>
           </div>
         </div>
       )}
