@@ -39,7 +39,10 @@ function TechPill({ icon: Icon, label, color }: { icon: React.ElementType; label
   const c = colorMap[color] || colorMap.indigo;
   return (
     <div
-      className="group/pill inline-flex items-center gap-2.5 px-5 py-3 mx-2 rounded-full cursor-default select-none whitespace-nowrap bg-white/[0.04] backdrop-blur-md border border-white/[0.08] transition-all duration-300 ease-out hover:bg-white/[0.07] hover:scale-105"
+      tabIndex={0}
+      role="group"
+      aria-label={label}
+      className="group/pill inline-flex items-center gap-2.5 px-5 py-3 mx-2 rounded-full cursor-default select-none whitespace-nowrap bg-white/[0.04] backdrop-blur-md border border-white/[0.08] transition-all duration-300 ease-out hover:bg-white/[0.07] hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
       style={
         {
           "--pill-border": c.borderColor,
@@ -52,6 +55,16 @@ function TechPill({ icon: Icon, label, color }: { icon: React.ElementType; label
         el.style.boxShadow = `0 0 20px ${c.shadowColor}`;
       }}
       onMouseLeave={(e) => {
+        const el = e.currentTarget;
+        el.style.borderColor = "";
+        el.style.boxShadow = "";
+      }}
+      onFocus={(e) => {
+        const el = e.currentTarget;
+        el.style.borderColor = c.borderColor;
+        el.style.boxShadow = `0 0 20px ${c.shadowColor}`;
+      }}
+      onBlur={(e) => {
         const el = e.currentTarget;
         el.style.borderColor = "";
         el.style.boxShadow = "";
@@ -72,6 +85,7 @@ function TechPill({ icon: Icon, label, color }: { icon: React.ElementType; label
 
 function MarqueeRow({ items, reverse = false, speed = 35 }: { items: typeof integrations; reverse?: boolean; speed?: number }) {
   const duplicated = [...items, ...items, ...items];
+  const [paused, setPaused] = React.useState(false);
   return (
     <div className="relative overflow-hidden group/marquee my-3">
       {/* Edge fade masks */}
@@ -82,16 +96,12 @@ function MarqueeRow({ items, reverse = false, speed = 35 }: { items: typeof inte
         className="flex w-max"
         style={{
           animation: `${reverse ? "marquee-right" : "marquee-left"} ${speed}s linear infinite`,
-          animationPlayState: "var(--marquee-state, running)",
+          animationPlayState: paused ? "paused" : "running",
         }}
-        onMouseEnter={() => {
-          const el = document.documentElement;
-          el.style.setProperty("--marquee-state", "paused");
-        }}
-        onMouseLeave={() => {
-          const el = document.documentElement;
-          el.style.setProperty("--marquee-state", "running");
-        }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={() => setPaused(false)}
       >
         {duplicated.map((item, i) => (
           <TechPill key={`${item.label}-${i}`} icon={item.icon} label={item.label} color={item.color} />
@@ -140,13 +150,13 @@ export default function ExistingStack() {
           </motion.p>
         </div>
 
-        {/* AI Core Hub — Desktop only */}
+        {/* AI Core Hub */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
-          className="hidden lg:flex justify-center mb-10"
+          className="flex justify-center mb-10"
         >
           <div className="relative px-8 py-5 rounded-2xl bg-indigo-600/10 border border-indigo-500/25 shadow-[0_0_50px_rgba(99,102,241,0.15)]">
             <div className="flex items-center gap-3">

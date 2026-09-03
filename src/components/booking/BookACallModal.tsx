@@ -24,6 +24,8 @@ import {
   TIME_SLOTS,
   bookingSchema,
   formatTimeLabel,
+  getMaxBookingDateLocal,
+  getTodayIsoDateLocal,
   type BookingFormValues,
 } from "@/lib/validations/booking";
 
@@ -33,16 +35,16 @@ type BookACallModalProps = {
 };
 
 const fieldClass =
-  "h-11 w-full rounded-xl bg-white/[0.05] border-white/[0.1] text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-indigo-500/20 [color-scheme:dark]";
+  "h-11 w-full rounded-xl bg-white/[0.05] border-white/[0.1] text-white placeholder:text-white/30 focus-visible:border-indigo-500/50 focus-visible:ring-indigo-500/20 [color-scheme:dark] disabled:opacity-50 disabled:cursor-not-allowed";
 
-function todayIsoDate() {
-  return new Date().toISOString().split("T")[0];
-}
+export { fieldClass as bookingFieldClass };
 
 export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
   const [meetLink, setMeetLink] = React.useState<string | null>(null);
   const [copied, setCopied] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+
+  const [honeypot, setHoneypot] = React.useState("");
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -62,6 +64,9 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
     formState: { errors, isSubmitting },
   } = form;
 
+  const previousOverflowRef = React.useRef<string | null>(null);
+  const copyTimeoutRef = React.useRef<number | null>(null);
+
   React.useEffect(() => {
     if (!open) return;
 
@@ -71,13 +76,22 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
       }
     };
 
+    previousOverflowRef.current = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKeyDown);
+    // Focus first field after mount (query instead of ref-merge to avoid RHF ref conflict)
+    window.setTimeout(() => document.getElementById("companyName")?.focus(), 50);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflowRef.current ?? "";
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open, isSubmitting, onOpenChange]);
+
+  React.useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
+    };
+  }, []);
 
   const close = () => {
     if (isSubmitting) return;
@@ -86,12 +100,17 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
 
   const onSubmit = async (values: BookingFormValues) => {
     setServerError(null);
-    const result = await createBooking(values);
-    if (!result.success) {
-      setServerError(result.error);
-      return;
+    try {
+      const payload = { ...values, website: honeypot };
+      const result = await createBooking(payload);
+      if (!result.success) {
+        setServerError(result.error ?? "Unable to complete your booking. Please try again.");
+        return;
+      }
+      setMeetLink(result.meetLink);
+    } catch {
+      setServerError("Unable to complete your booking. Please check your connection and try again.");
     }
-    setMeetLink(result.meetLink);
   };
 
   const handleCloseComplete = (latestOpen: boolean) => {
@@ -104,9 +123,27 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
 
   const copyLink = async () => {
     if (!meetLink) return;
-    await navigator.clipboard.writeText(meetLink);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1800);
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(meetLink);
+      } else {
+        // Fallback for insecure contexts / older browsers
+        const ta = document.createElement("textarea");
+        ta.value = meetLink;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      setCopied(true);
+      if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setServerError("Failed to copy link. Please copy it manually.");
+    }
   };
 
   return (
@@ -132,6 +169,7 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="book-call-title"
+            aria-describedby="book-call-description"
             initial={{ opacity: 0, y: 32, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.96 }}
@@ -148,7 +186,7 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                 <h2 id="book-call-title" className="text-xl font-semibold text-white">
                   {meetLink ? "You are booked" : "Book a strategy call"}
                 </h2>
-                <p className="text-sm text-muted-foreground mt-1">
+                <p id="book-call-description" className="text-sm text-muted-foreground mt-1">
                   {meetLink
                     ? "A Google Meet link is ready. Details are also in your inbox."
                     : "Pick a time. We generate a Meet link and confirm instantly."}
@@ -157,8 +195,9 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
               <button
                 type="button"
                 onClick={close}
-                className="rounded-lg p-2 text-white/50 hover:text-white hover:bg-white/5 transition-colors cursor-pointer"
-                aria-label="Close"
+                disabled={isSubmitting}
+                className="rounded-lg p-2 text-white/50 hover:text-white hover:bg-white/5 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Close booking dialog"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -205,10 +244,13 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                       id="companyName"
                       placeholder="Acme Robotics"
                       className={fieldClass}
+                      aria-invalid={!!errors.companyName}
+                      aria-describedby={errors.companyName ? "companyName-error" : undefined}
+                      disabled={isSubmitting}
                       {...register("companyName")}
                     />
                     {errors.companyName && (
-                      <p className="text-xs text-red-400">{errors.companyName.message}</p>
+                      <p id="companyName-error" role="alert" className="text-xs text-red-400">{errors.companyName.message}</p>
                     )}
                   </div>
 
@@ -222,10 +264,13 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                       type="email"
                       placeholder="you@company.com"
                       className={fieldClass}
+                      aria-invalid={!!errors.companyEmail}
+                      aria-describedby={errors.companyEmail ? "companyEmail-error" : undefined}
+                      disabled={isSubmitting}
                       {...register("companyEmail")}
                     />
                     {errors.companyEmail && (
-                      <p className="text-xs text-red-400">{errors.companyEmail.message}</p>
+                      <p id="companyEmail-error" role="alert" className="text-xs text-red-400">{errors.companyEmail.message}</p>
                     )}
                   </div>
 
@@ -238,12 +283,16 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                       <Input
                         id="date"
                         type="date"
-                        min={todayIsoDate()}
+                        min={getTodayIsoDateLocal()}
+                        max={getMaxBookingDateLocal()}
                         className={fieldClass}
+                        aria-invalid={!!errors.date}
+                        aria-describedby={errors.date ? "date-error" : undefined}
+                        disabled={isSubmitting}
                         {...register("date")}
                       />
                       {errors.date && (
-                        <p className="text-xs text-red-400">{errors.date.message}</p>
+                        <p id="date-error" role="alert" className="text-xs text-red-400">{errors.date.message}</p>
                       )}
                     </div>
 
@@ -255,6 +304,9 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                       <select
                         id="time"
                         className={cn(fieldClass, "px-2.5 text-sm outline-none")}
+                        aria-invalid={!!errors.time}
+                        aria-describedby={errors.time ? "time-error" : undefined}
+                        disabled={isSubmitting}
                         {...register("time")}
                       >
                         {TIME_SLOTS.map((slot) => (
@@ -264,7 +316,7 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                         ))}
                       </select>
                       {errors.time && (
-                        <p className="text-xs text-red-400">{errors.time.message}</p>
+                        <p id="time-error" role="alert" className="text-xs text-red-400">{errors.time.message}</p>
                       )}
                     </div>
                   </div>
@@ -277,6 +329,9 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                     <select
                       id="budget"
                       className={cn(fieldClass, "px-2.5 text-sm outline-none")}
+                      aria-invalid={!!errors.budget}
+                      aria-describedby={errors.budget ? "budget-error" : undefined}
+                      disabled={isSubmitting}
                       {...register("budget")}
                     >
                       {BUDGET_OPTIONS.map((option) => (
@@ -286,12 +341,26 @@ export function BookACallModal({ open, onOpenChange }: BookACallModalProps) {
                       ))}
                     </select>
                     {errors.budget && (
-                      <p className="text-xs text-red-400">{errors.budget.message}</p>
+                      <p id="budget-error" role="alert" className="text-xs text-red-400">{errors.budget.message}</p>
                     )}
                   </div>
 
+                  {/* Honeypot — hidden from users, bots fill it */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="website" className="hidden">Website</label>
+                    <input
+                      id="website"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      placeholder="Leave blank"
+                    />
+                  </div>
+
                   {serverError && (
-                    <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
+                    <p role="alert" aria-live="polite" className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
                       {serverError}
                     </p>
                   )}

@@ -350,7 +350,10 @@ export default function Technology() {
               <motion.div
                 key={pillar.title}
                 variants={fadeUp}
-                className="group relative p-6 sm:p-7 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 transition-all duration-400 ease-out hover:scale-[1.02] hover:border-transparent overflow-hidden"
+                tabIndex={0}
+                role="group"
+                aria-label={pillar.title}
+                className="group relative p-6 sm:p-7 rounded-2xl bg-zinc-900/50 border border-zinc-800/80 transition-all duration-400 ease-out hover:scale-[1.02] hover:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 overflow-hidden"
                 style={
                   {
                     "--card-glow": pillar.accentGlow,
@@ -363,6 +366,16 @@ export default function Technology() {
                   el.style.boxShadow = `0 0 30px ${pillar.accentGlow}, inset 0 0 30px ${pillar.accentGlow}`;
                 }}
                 onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "";
+                  el.style.boxShadow = "";
+                }}
+                onFocus={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = pillar.accentBorder;
+                  el.style.boxShadow = `0 0 30px ${pillar.accentGlow}, inset 0 0 30px ${pillar.accentGlow}`;
+                }}
+                onBlur={(e) => {
                   const el = e.currentTarget;
                   el.style.borderColor = "";
                   el.style.boxShadow = "";

@@ -125,6 +125,11 @@ export default function ValueProposition() {
           variants={stagger}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6"
           onMouseLeave={() => setHoveredIndex(null)}
+          onFocusCapture={(e) => {
+            const el = (e.target as HTMLElement).closest("[data-pillar]") as HTMLElement | null;
+            if (el?.dataset.pillar) setHoveredIndex(Number(el.dataset.pillar));
+          }}
+          onBlurCapture={() => setHoveredIndex(null)}
         >
           {pillars.map((pillar, idx) => {
             const PillarIcon = pillar.icon;
@@ -135,7 +140,13 @@ export default function ValueProposition() {
               <motion.div
                 key={pillar.title}
                 variants={fadeUp}
+                data-pillar={idx}
+                tabIndex={0}
+                role="group"
+                aria-label={pillar.title}
                 onMouseEnter={() => setHoveredIndex(idx)}
+                onFocus={() => setHoveredIndex(idx)}
+                onBlur={() => setHoveredIndex((v) => (v === idx ? null : v))}
                 className={`
                   relative p-7 sm:p-8 rounded-2xl cursor-default
                   bg-gradient-to-b from-white/[0.03] to-white/[0.01]

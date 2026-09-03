@@ -39,20 +39,41 @@ function shell(title: string, body: string) {
 </html>`;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function sanitizeUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") return "#";
+    return parsed.toString();
+  } catch {
+    return "#";
+  }
+}
+
 function detailRow(label: string, value: string) {
   return `<tr>
-    <td style="padding:8px 0;color:${brand.muted};font-size:13px;width:140px;vertical-align:top;">${label}</td>
-    <td style="padding:8px 0;color:${brand.text};font-size:14px;">${value}</td>
+    <td style="padding:8px 0;color:${brand.muted};font-size:13px;width:140px;vertical-align:top;">${escapeHtml(label)}</td>
+    <td style="padding:8px 0;color:${brand.text};font-size:14px;">${escapeHtml(value)}</td>
   </tr>`;
 }
 
 function meetButton(url: string) {
+  const safeUrl = sanitizeUrl(url);
+  const safeUrlHtml = escapeHtml(safeUrl);
   return `<p style="margin:24px 0 8px;">
-    <a href="${url}" style="display:inline-block;background:${brand.indigo};color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;">
+    <a href="${safeUrlHtml}" style="display:inline-block;background:${brand.indigo};color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;">
       Join Google Meet
     </a>
   </p>
-  <p style="margin:0;font-size:12px;color:${brand.muted};word-break:break-all;">${url}</p>`;
+  <p style="margin:0;font-size:12px;color:${brand.muted};word-break:break-all;">${safeUrlHtml}</p>`;
 }
 
 export function customerBookingEmail(booking: BookingFormValues, meetLink: string) {

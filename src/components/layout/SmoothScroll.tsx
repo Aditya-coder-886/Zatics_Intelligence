@@ -7,11 +7,12 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 export default function SmoothScroll() {
   useEffect(() => {
-    // Respect user reduced-motion setting
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      console.log("[Lenis] Reduced motion preferred. Smooth scroll disabled.");
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (mediaQuery.matches) {
       return;
     }
+
+    gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({
       duration: 1.1,
@@ -19,8 +20,17 @@ export default function SmoothScroll() {
       smoothWheel: true,
     });
 
-    // Synchronize Lenis scroll position with GSAP ScrollTrigger
-    lenis.on("scroll", ScrollTrigger.update);
+    // Throttle ScrollTrigger update via rAF
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ScrollTrigger.update();
+        ticking = false;
+      });
+    };
+    lenis.on("scroll", onScroll);
 
     const updateLenis = (time: number) => {
       lenis.raf(time * 1000);
@@ -29,9 +39,18 @@ export default function SmoothScroll() {
     gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
+    const onReduceChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        lenis.destroy();
+        gsap.ticker.remove(updateLenis);
+      }
+    };
+    mediaQuery.addEventListener("change", onReduceChange);
+
     return () => {
       lenis.destroy();
       gsap.ticker.remove(updateLenis);
+      mediaQuery.removeEventListener("change", onReduceChange);
     };
   }, []);
 

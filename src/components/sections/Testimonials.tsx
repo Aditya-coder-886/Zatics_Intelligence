@@ -1,12 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { testimonialsData } from "@/data/testimonials";
 
 export default function Testimonials() {
   const [index, setIndex] = useState(0);
+
+  if (testimonialsData.length === 0) {
+    return (
+      <section className="py-24 bg-background relative overflow-hidden z-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm text-zinc-500">No testimonials yet.</p>
+        </div>
+      </section>
+    );
+  }
 
   const prevSlide = () => {
     setIndex((prev) => (prev === 0 ? testimonialsData.length - 1 : prev - 1));
@@ -20,8 +31,8 @@ export default function Testimonials() {
   const activeSecond = testimonialsData[(index + 1) % testimonialsData.length];
 
   return (
-    <section className="py-24 bg-background relative overflow-hidden z-10 border-t border-white/5">
-      <div className="absolute top-1/2 left-0 w-80 h-80 bg-indigo-500/2 blur-[100px] rounded-full pointer-events-none" />
+    <section aria-label="Testimonials" className="py-24 bg-background relative overflow-hidden z-10 border-t border-white/5">
+      <div className="absolute top-1/2 left-0 w-80 h-80 bg-indigo-500/[0.02] blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-16 gap-6">
@@ -63,9 +74,9 @@ export default function Testimonials() {
               className="bg-white/[0.02] border border-white/5 p-8 rounded-2xl flex flex-col justify-between h-full"
             >
               <div>
-                <div className="flex gap-1 mb-4">
+                <div className="flex gap-1 mb-4" aria-label={`Rating ${activeFirst.rating} out of 5`}>
                   {Array.from({ length: activeFirst.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
                   ))}
                 </div>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed italic">
@@ -74,9 +85,12 @@ export default function Testimonials() {
               </div>
 
               <div className="flex items-center gap-4 mt-6">
-                <img
+                <Image
                   src={activeFirst.avatarUrl}
                   alt={activeFirst.author}
+                  width={40}
+                  height={40}
+                  unoptimized
                   className="w-10 h-10 rounded-full border border-white/10 object-cover"
                 />
                 <div>
@@ -98,9 +112,9 @@ export default function Testimonials() {
               className="bg-white/[0.02] border border-white/5 p-8 rounded-2xl flex flex-col justify-between h-full hidden md:flex"
             >
               <div>
-                <div className="flex gap-1 mb-4">
+                <div className="flex gap-1 mb-4" aria-label={`Rating ${activeSecond.rating} out of 5`}>
                   {Array.from({ length: activeSecond.rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" aria-hidden="true" />
                   ))}
                 </div>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed italic">
@@ -109,9 +123,12 @@ export default function Testimonials() {
               </div>
 
               <div className="flex items-center gap-4 mt-6">
-                <img
+                <Image
                   src={activeSecond.avatarUrl}
                   alt={activeSecond.author}
+                  width={40}
+                  height={40}
+                  unoptimized
                   className="w-10 h-10 rounded-full border border-white/10 object-cover"
                 />
                 <div>

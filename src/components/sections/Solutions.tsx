@@ -36,7 +36,7 @@ const segmentColors: Record<string, { border: string; text: string; bg: string }
 
 export default function WhoWeWorkWith() {
   return (
-    <section className="py-24 sm:py-32 bg-background relative overflow-hidden z-10 border-t border-white/5">
+    <section id="audience" aria-label="Who we work with" className="py-24 sm:py-32 bg-background relative overflow-hidden z-10 border-t border-white/5">
       {/* Ambient glow */}
       <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-indigo-500/[0.03] blur-[120px] rounded-full pointer-events-none" />
 

@@ -44,11 +44,12 @@ export default function HeroNetwork() {
       const dpr = window.devicePixelRatio || 1;
       width = rect.width;
       height = rect.height;
-      
+
       canvas.width = width * dpr;
       canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-      
+      // Reset transform before scaling to avoid cumulative scaling
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
       initParticles();
     };
 
@@ -73,7 +74,17 @@ export default function HeroNetwork() {
       }
     };
 
-    const draw = () => {
+    let lastFrame = 0;
+    let isVisible = true;
+    const targetFps = isReducedMotion ? 15 : 30;
+    const frameInterval = 1000 / targetFps;
+
+    const draw = (now: number = 0) => {
+      animationFrameId = requestAnimationFrame(draw);
+      if (!isVisible) return;
+      if (now - lastFrame < frameInterval) return;
+      lastFrame = now;
+
       ctx.clearRect(0, 0, width, height);
 
       const maxDistance = width < 768 ? 100 : 150;
@@ -98,7 +109,7 @@ export default function HeroNetwork() {
           const dx = mouseRef.current.x - p.x;
           const dy = mouseRef.current.y - p.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < mouseMaxDistance) {
+          if (dist < mouseMaxDistance && dist > 0.1) {
             const force = (mouseMaxDistance - dist) / mouseMaxDistance;
             p.x += (dx / dist) * force * 0.8;
             p.y += (dy / dist) * force * 0.8;
@@ -111,7 +122,7 @@ export default function HeroNetwork() {
         // Bright violet core for particles
         ctx.fillStyle = `rgba(99, 102, 241, ${Math.max(0.1, currentAlpha)})`;
         ctx.fill();
-        
+
         // Inner glowing dot
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius * 0.5, 0, Math.PI * 2);
@@ -119,7 +130,7 @@ export default function HeroNetwork() {
         ctx.fill();
       });
 
-      // Draw connections
+      // Draw connections - use solid color instead of per-pair gradients for perf
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const p1 = particles[i];
@@ -131,32 +142,42 @@ export default function HeroNetwork() {
 
           if (dist < maxDistance) {
             // Compute line opacity based on distance
-            const alpha = (1 - dist / maxDistance) * 0.12 * Math.min(p1.alpha, p2.alpha);
+            const alpha = (1 - dist / maxDistance) * 0.08 * Math.min(p1.alpha, p2.alpha);
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            
-            // Create soft gradient for links
-            const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
-            gradient.addColorStop(0, `rgba(99, 102, 241, ${alpha})`);
-            gradient.addColorStop(0.5, `rgba(139, 92, 246, ${alpha * 0.8})`);
-            gradient.addColorStop(1, `rgba(59, 130, 246, ${alpha})`);
-            
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 0.75;
+            ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+            ctx.lineWidth = 0.6;
             ctx.stroke();
           }
         }
       }
-
-      animationFrameId = requestAnimationFrame(draw);
     };
 
     window.addEventListener("resize", resize);
     resize();
+    // Pause when offscreen
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+        });
+      },
+      { threshold: 0 }
+    );
+    observer.observe(canvas);
+    // Respect visibility API
+    const onVisibility = () => {
+      isVisible = document.visibilityState === "visible" && canvas.getBoundingClientRect().top < window.innerHeight;
+    };
+    document.addEventListener("visibilitychange", onVisibility);
     draw();
 
+    let lastMove = 0;
     const handleMouseMove = (e: MouseEvent) => {
+      const now = performance.now();
+      if (now - lastMove < 32) return; // ~30Hz throttle
+      lastMove = now;
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
         x: e.clientX - rect.left,
@@ -174,6 +195,8 @@ export default function HeroNetwork() {
 
     return () => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", onVisibility);
+      observer.disconnect();
       mediaQuery.removeEventListener("change", handleReducedMotionChange);
       cancelAnimationFrame(animationFrameId);
       if (canvas) {

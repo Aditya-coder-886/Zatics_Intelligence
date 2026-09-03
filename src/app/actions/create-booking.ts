@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { bookingSchema, type BookingFormValues } from "@/lib/validations/booking";
 import {
   appendBookingToSheet,
@@ -9,8 +10,12 @@ import {
 import { adminBookingEmail, customerBookingEmail } from "@/lib/booking-emails";
 import { resend, isResendConfigured } from "@/lib/resend";
 import { getSupabaseServer, isSupabaseServerConfigured } from "@/lib/supabase-server";
+import { checkRateLimit, getClientIpFromHeaders } from "@/lib/rate-limit";
 
 const ADMIN_EMAIL = process.env.BOOKING_ADMIN_EMAIL || "adityayadav@gmail.com";
+
+// In preview/dev we allow mock Meet; in production we fail-closed if Google not configured.
+const isProduction = process.env.NODE_ENV === "production";
 
 export type CreateBookingResult =
   | { success: true; meetLink: string }
@@ -79,6 +84,17 @@ async function sendBookingEmails(booking: BookingFormValues, meetLink: string) {
 }
 
 export async function createBooking(input: unknown): Promise<CreateBookingResult> {
+  // Allow optional honeypot field without failing schema (spam bots fill it)
+  const raw = input as Record<string, unknown> | null;
+  if (raw && typeof raw === "object" && "website" in raw) {
+    const honeypot = String((raw as Record<string, unknown>).website ?? "").trim();
+    if (honeypot) {
+      // Silently succeed to avoid bot feedback, but do not create booking
+      console.warn("[Booking] Honeypot triggered, dropping request.");
+      return { success: false, error: "Invalid booking details." };
+    }
+  }
+
   const parsed = bookingSchema.safeParse(input);
   if (!parsed.success) {
     const firstIssue = parsed.error.issues[0]?.message ?? "Invalid booking details.";
@@ -86,6 +102,23 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
   }
 
   const booking = parsed.data;
+
+  // Rate limiting: 5 bookings per 10 min per IP + 3 per 10 min per email
+  try {
+    const hdrs = await headers();
+    const ip = getClientIpFromHeaders(hdrs as unknown as Headers);
+    const ipCheck = checkRateLimit(`booking:ip:${ip}`, 5, 10 * 60 * 1000);
+    if (!ipCheck.allowed) {
+      return { success: false, error: "Too many booking attempts. Please try again in a few minutes." };
+    }
+    const emailKey = booking.companyEmail.toLowerCase().trim();
+    const emailCheck = checkRateLimit(`booking:email:${emailKey}`, 3, 10 * 60 * 1000);
+    if (!emailCheck.allowed) {
+      return { success: false, error: "Too many booking attempts for this email. Please try again later." };
+    }
+  } catch {
+    // headers() may fail in some test contexts — do not block booking
+  }
 
   try {
     let meetLink = "";
@@ -95,8 +128,11 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
       const event = await createGoogleMeetEvent(booking);
       meetLink = event.meetLink;
       calendarEventId = event.eventId;
+    } else if (isProduction) {
+      console.error("[Booking] Google APIs not configured in production. Rejecting booking.");
+      return { success: false, error: "Booking service is temporarily unavailable. Please email us directly at hello@zatics.com." };
     } else {
-      console.log("[Booking] Google APIs not configured. Using preview Meet link.");
+      console.log("[Booking] Google APIs not configured. Using preview Meet link (dev only).");
       meetLink = `https://meet.google.com/preview-${crypto.randomUUID().slice(0, 8)}`;
     }
 
@@ -130,12 +166,13 @@ export async function createBooking(input: unknown): Promise<CreateBookingResult
     return { success: true, meetLink };
   } catch (error) {
     console.error("[Booking] Failed to create booking:", error);
+    // Do not leak internal error messages to client (e.g., Google key errors, sheet not found)
+    const message = error instanceof Error ? error.message : "";
+    // Allow only safe user-facing messages (validation already handled above)
+    const isSafeMessage = message.includes("Calendar event was created but no Google Meet link");
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unable to complete your booking. Please try again.",
+      error: isSafeMessage ? message : "Unable to complete your booking. Please try again or email hello@zatics.com.",
     };
   }
 }

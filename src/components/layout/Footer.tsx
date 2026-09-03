@@ -58,7 +58,7 @@ export default function Footer() {
               Solutions
             </h4>
             <ul className="space-y-2.5">
-              {footerLinks.solutions.slice(0, 5).map((link) => (
+              {footerLinks.solutions.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
@@ -76,7 +76,7 @@ export default function Footer() {
               Technology
             </h4>
             <ul className="space-y-2.5">
-              {footerLinks.technology.slice(0, 5).map((link) => (
+              {footerLinks.technology.map((link) => (
                 <li key={link.label}>
                   <Link
                     href={link.href}
@@ -118,7 +118,9 @@ export default function Footer() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-[11px] text-zinc-600 hover:text-zinc-300 transition-colors duration-200"
+                aria-disabled={link.href === "#"}
+                title={link.href === "#" ? "Coming soon" : undefined}
+                className="text-[11px] text-zinc-600 hover:text-zinc-300 transition-colors duration-200 aria-disabled:opacity-60 aria-disabled:cursor-not-allowed"
               >
                 {link.label}
               </Link>

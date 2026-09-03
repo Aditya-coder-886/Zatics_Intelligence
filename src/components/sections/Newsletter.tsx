@@ -78,14 +78,22 @@ export default function Newsletter() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3">
+              <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3" noValidate>
                 <div className="flex-1 relative">
+                  <label htmlFor="newsletter-email" className="sr-only">
+                    Email address
+                  </label>
                   <input
+                    id="newsletter-email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={status === "loading"}
+                    aria-label="Email address"
+                    aria-invalid={status === "error"}
+                    aria-describedby={status === "error" ? "newsletter-error" : undefined}
+                    required
                     className="w-full bg-white/[0.03] border border-zinc-800 focus:border-indigo-500/60 text-white text-sm rounded-xl px-5 py-3.5 outline-none transition-colors duration-200 placeholder:text-zinc-600 disabled:opacity-50"
                   />
                 </div>
@@ -107,11 +115,14 @@ export default function Newsletter() {
             )}
 
             {status === "error" && (
-              <div className="mt-3 flex items-start gap-2 text-red-400 text-xs pl-1">
-                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+              <div id="newsletter-error" role="alert" aria-live="polite" className="mt-3 flex items-start gap-2 text-red-400 text-xs pl-1">
+                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" aria-hidden="true" />
                 <p>{errorMessage}</p>
               </div>
             )}
+            <div aria-live="polite" className="sr-only">
+              {status === "success" ? "Subscribed successfully" : ""}
+            </div>
           </div>
         </motion.div>
       </div>

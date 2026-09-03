@@ -62,8 +62,19 @@ function bookingDurationMinutes(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
 }
 
+function sanitizeCalendarText(value: string, maxLen = 120): string {
+  // Strip control chars, trim, limit length to prevent injection/overflow in calendar
+  return value.replace(/[\r\n\t]+/g, " ").replace(/[^\P{C}\s]/gu, "").trim().slice(0, maxLen);
+}
+
 function addMinutesToDateTime(date: string, time: string, minutes: number) {
-  const [hours, mins] = time.split(":").map(Number);
+  const parts = time.split(":");
+  if (parts.length !== 2) return { date, time: "00:00" };
+  const hours = Number(parts[0]);
+  const mins = Number(parts[1]);
+  if (!Number.isFinite(hours) || !Number.isFinite(mins) || hours < 0 || hours > 23 || mins < 0 || mins > 59) {
+    return { date, time: "00:00" };
+  }
   let total = hours * 60 + mins + minutes;
   const dayOffset = Math.floor(total / (24 * 60));
   total = ((total % (24 * 60)) + 24 * 60) % (24 * 60);
@@ -74,7 +85,10 @@ function addMinutesToDateTime(date: string, time: string, minutes: number) {
     return { date, time: `${endHours}:${endMins}` };
   }
 
-  const next = new Date(`${date}T00:00:00Z`);
+  const [y, m, d] = date.split("-").map(Number);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return { date, time: `${endHours}:${endMins}` };
+  const next = new Date(Date.UTC(y, m - 1, d));
+  if (Number.isNaN(next.getTime())) return { date, time: `${endHours}:${endMins}` };
   next.setUTCDate(next.getUTCDate() + dayOffset);
   return {
     date: next.toISOString().slice(0, 10),
@@ -95,11 +109,11 @@ export async function createGoogleMeetEvent(booking: BookingFormValues): Promise
   const requestId = crypto.randomUUID();
 
   const event: calendar_v3.Schema$Event = {
-    summary: `Discovery Call — ${booking.companyName}`,
+    summary: `Discovery Call — ${sanitizeCalendarText(booking.companyName, 80)}`,
     description: [
-      `Company: ${booking.companyName}`,
-      `Email: ${booking.companyEmail}`,
-      `Budget: ${formatBudgetLabel(booking.budget)}`,
+      `Company: ${sanitizeCalendarText(booking.companyName, 120)}`,
+      `Email: ${sanitizeCalendarText(booking.companyEmail, 254)}`,
+      `Budget: ${sanitizeCalendarText(formatBudgetLabel(booking.budget), 30)}`,
       "",
       "Booked via Zatics Intelligence website.",
     ].join("\n"),

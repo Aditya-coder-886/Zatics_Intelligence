@@ -80,7 +80,7 @@ export default function Process() {
               className="relative group p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800/60 transition-all duration-300 hover:border-zinc-700/60 text-center sm:text-left"
             >
               {/* Large transparent number behind content */}
-              <span className="absolute top-3 right-4 text-5xl sm:text-6xl font-black font-mono text-white/[0.03] select-none pointer-events-none leading-none">
+              <span aria-hidden="true" className="absolute top-3 right-4 text-5xl sm:text-6xl font-black font-mono text-white/[0.06] select-none pointer-events-none leading-none">
                 {step.number}
               </span>
 

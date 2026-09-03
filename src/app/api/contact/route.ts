@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     if (isResendConfigured()) {
       try {
         const { error } = await resend.emails.send({
-          from: "Zatics Intelligence <inquiry@zatics.com>",
+          from: "rahulmishra002003@gmail.com",
           to: "sales@zatics.com", // configure recipient
           subject: `New Lead: ${name} (${company})`,
           text: `

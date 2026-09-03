@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { faqData } from "@/data/faq";
 
@@ -14,19 +14,6 @@ function AccordionItem({
   onToggle: () => void;
 }) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-
-  const updateHeight = useCallback(() => {
-    if (contentRef.current) {
-      setHeight(contentRef.current.scrollHeight);
-    }
-  }, []);
-
-  useEffect(() => {
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, [updateHeight]);
 
   return (
     <div
@@ -36,10 +23,11 @@ function AccordionItem({
       `}
     >
       <button
+        id={`faq-question-${item.id}`}
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={`faq-answer-${item.id}`}
-        className="w-full flex items-center justify-between gap-4 py-5 sm:py-6 text-left cursor-pointer group"
+        className="w-full flex items-center justify-between gap-4 py-5 sm:py-6 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded"
       >
         <span
           className={`
@@ -100,11 +88,23 @@ export default function FAQ() {
     setOpenId((prev) => (prev === id ? null : id));
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqData.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+
   return (
     <section
       id="faq"
+      aria-label="Frequently asked questions"
       className="py-24 sm:py-32 bg-background relative overflow-hidden z-10 border-t border-white/5"
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {/* Ambient glow */}
       <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-blue-500/[0.02] blur-[100px] rounded-full pointer-events-none" />
 

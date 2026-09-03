@@ -11,6 +11,7 @@ import CaseStudies from "@/components/sections/CaseStudies";
 import Solutions from "@/components/sections/Solutions";
 import Process from "@/components/sections/Process";
 import Testimonials from "@/components/sections/Testimonials";
+import Metrics from "@/components/sections/Metrics";
 import Contact from "@/components/sections/Contact";
 import Engagement from "@/components/sections/Engagement";
 import FAQ from "@/components/sections/FAQ";
@@ -36,6 +37,7 @@ export default function Home() {
         <Solutions />
         <Process />
         <Testimonials />
+        <Metrics />
         <Contact />
         <Engagement />
         <FAQ />

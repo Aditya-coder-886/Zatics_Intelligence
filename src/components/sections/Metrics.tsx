@@ -6,7 +6,7 @@ import { metricsData } from "@/data/metrics";
 
 export default function Metrics() {
   return (
-    <section id="intelligence" className="py-24 bg-background relative overflow-hidden z-10 border-y border-white/5">
+    <section id="metrics" aria-label="System outcomes metrics" className="py-24 bg-background relative overflow-hidden z-10 border-y border-white/5">
       <div className="absolute top-1/4 right-0 w-80 h-80 bg-blue-500/3 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,9 +25,11 @@ export default function Metrics() {
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {metricsData.map((metric, idx) => (
-            <MetricCard key={metric.id} metric={metric} index={idx} />
-          ))}
+          {metricsData.length === 0 ? (
+            <p className="col-span-full text-center text-sm text-zinc-500">No metrics to display.</p>
+          ) : (
+            metricsData.map((metric, idx) => <MetricCard key={metric.id} metric={metric} index={idx} />)
+          )}
         </div>
       </div>
     </section>
@@ -57,20 +59,28 @@ function MetricCard({ metric, index }: MetricCardProps) {
     const steps = 60;
     const increment = metric.numericValue / steps;
     let stepCount = 0;
+    let rafId = 0;
+    let lastTick = performance.now();
 
-    const timer = setInterval(() => {
+    const tick = (now: number) => {
+      if (now - lastTick < duration / steps) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
+      lastTick = now;
       stepCount++;
       setDisplayValue((prev) => {
         const nextVal = prev + increment;
         if (stepCount >= steps) {
-          clearInterval(timer);
           return metric.numericValue;
         }
+        rafId = requestAnimationFrame(tick);
         return nextVal;
       });
-    }, duration / steps);
-
-    return () => clearInterval(timer);
+      if (stepCount >= steps) return;
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
   }, [isInView, metric.numericValue]);
 
   // Format the display value: round floats or format integers

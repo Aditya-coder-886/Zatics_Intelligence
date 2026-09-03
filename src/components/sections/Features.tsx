@@ -5,8 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { featuresData } from "@/data/features";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
-import * as Icons from "lucide-react";
+import { ArrowRight, ArrowUpRight, Workflow, Bot, Server, Mic, Puzzle, Rocket, Cpu } from "lucide-react";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -22,17 +21,33 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
 };
 
+const featureIconMap: Record<string, React.ElementType> = {
+  Workflow,
+  Bot,
+  Server,
+  Mic,
+  Puzzle,
+  Rocket,
+  Cpu,
+};
+
 function CardSpotlight({ children, className }: { children: React.ReactNode; className?: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    card.style.setProperty("--spotlight-x", `${x}px`);
-    card.style.setProperty("--spotlight-y", `${y}px`);
+    if (rafRef.current) return;
+    const { clientX, clientY } = e;
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null;
+      const card = cardRef.current;
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      card.style.setProperty("--spotlight-x", `${x}px`);
+      card.style.setProperty("--spotlight-y", `${y}px`);
+    });
   };
 
   return (
@@ -67,7 +82,8 @@ function CardSpotlight({ children, className }: { children: React.ReactNode; cla
 export default function Features() {
   return (
     <section
-      id="services"
+      id="solutions"
+      aria-label="What we build"
       className="py-24 sm:py-32 bg-background relative overflow-hidden z-10"
     >
       {/* Ambient glows */}
@@ -119,24 +135,26 @@ export default function Features() {
           variants={stagger}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6"
         >
-          {featuresData.map((feature, idx) => {
-            const IconComponent = (Icons as any)[feature.iconName] || Icons.Cpu;
+          {featuresData.length === 0 ? (
+            <p className="col-span-full text-center text-sm text-zinc-500">No capabilities to display.</p>
+          ) : featuresData.map((feature) => {
+              const IconComponent = featureIconMap[feature.iconName] || Cpu;
 
-            return (
-              <motion.div key={feature.id} variants={fadeUp}>
-                <CardSpotlight className="h-full p-6 sm:p-7 flex flex-col">
-                  <div className="flex items-center justify-between mb-5">
-                    <div
-                      className={cn(
-                        "w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20",
-                        "flex items-center justify-center text-indigo-400",
-                        "transition-transform duration-300 group-hover:scale-110"
-                      )}
-                    >
-                      <IconComponent className="w-5 h-5" />
+              return (
+                <motion.div key={feature.id} variants={fadeUp}>
+                  <CardSpotlight className="h-full p-6 sm:p-7 flex flex-col">
+                    <div className="flex items-center justify-between mb-5">
+                      <div
+                        className={cn(
+                          "w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/20",
+                          "flex items-center justify-center text-indigo-400",
+                          "transition-transform duration-300 group-hover:scale-110"
+                        )}
+                      >
+                        <IconComponent className="w-5 h-5" aria-hidden="true" />
+                      </div>
+                      <ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" aria-hidden="true" />
                     </div>
-                    <Icons.ArrowUpRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-indigo-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
-                  </div>
 
                   <h3 className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-indigo-300 transition-colors duration-300">
                     {feature.title}

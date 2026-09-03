@@ -306,11 +306,11 @@ export default function MeetingRoom() {
         <div className="mt-auto p-3 bg-white/5 rounded-lg">
           <p className="text-sm text-white/80 mb-2">Meeting Controls</p>
           <div className="flex items-center gap-3">
-            <button onClick={toggleVideo} className="p-2 rounded hover:bg-white/10">
-              <Video className="w-4 h-4 text-white/{videoEnabled ? '100' : '40'}" />
+            <button onClick={toggleVideo} className="p-2 rounded hover:bg-white/10" aria-label={videoEnabled ? "Turn off camera" : "Turn on camera"}>
+              <Video className={`w-4 h-4 ${videoEnabled ? "text-white" : "text-white/40"}`} />
             </button>
-            <button onClick={toggleMic} className="p-2 rounded hover:bg-white/10">
-              <Mic className="w-4 h-4 text-white/{micEnabled ? '100' : '40'}" />
+            <button onClick={toggleMic} className="p-2 rounded hover:bg-white/10" aria-label={micEnabled ? "Mute microphone" : "Unmute microphone"}>
+              <Mic className={`w-4 h-4 ${micEnabled ? "text-white" : "text-white/40"}`} />
             </button>
             <button onClick={() => setShowInviteModal(true)} className="p-2 rounded hover:bg-white/10">
               <Users className="w-4 h-4 text-white/60" />
@@ -409,7 +409,7 @@ export default function MeetingRoom() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`mb-3 p-3 rounded-lg max-w-[90%] ${msg.type === 'user' ? 'ml-auto bg-indigo-600/20' : msg.type === 'system' ? 'bg-white/10' : 'bg-white/5'}`}
                 >
-                  <p className="text-sm text-white/{msg.type === 'user' ? '100' : '90'} break-words">{msg.text}</p>
+                  <p className={`text-sm break-words ${msg.type === 'user' ? 'text-white' : 'text-white/90'}`}>{msg.text}</p>
                   {msg.type === 'system' && (
                     <p className="text-xs text-white/50 mt-1">[System]</p>
                   )}

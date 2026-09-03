@@ -139,6 +139,7 @@ const metrics = [
 
 export default function Differentiator() {
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+  const gridId = React.useId();
 
   return (
     <section className="py-24 sm:py-32 bg-background relative overflow-hidden z-10">
@@ -186,11 +187,11 @@ export default function Differentiator() {
             {/* Background grid */}
             <svg className="absolute inset-0 w-full h-full opacity-20" aria-hidden="true">
               <defs>
-                <pattern id="arch-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <pattern id={gridId} width="40" height="40" patternUnits="userSpaceOnUse">
                   <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
                 </pattern>
               </defs>
-              <rect width="100%" height="100%" fill="url(#arch-grid)" />
+              <rect width="100%" height="100%" fill={`url(#${gridId})`} />
             </svg>
 
             {/* Desktop: horizontal flow. Mobile: vertical flow via SVG viewBox */}
@@ -294,9 +295,21 @@ export default function Differentiator() {
                 return (
                   <g
                     key={node.id}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${node.label} ${node.sublabel}: ${node.tooltip}`}
                     onMouseEnter={() => setHoveredNode(node.id)}
                     onMouseLeave={() => setHoveredNode(null)}
-                    className="cursor-pointer"
+                    onFocus={() => setHoveredNode(node.id)}
+                    onBlur={() => setHoveredNode(null)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setHoveredNode((v) => (v === node.id ? null : node.id));
+                      }
+                      if (e.key === "Escape") setHoveredNode(null);
+                    }}
+                    className="cursor-pointer focus-visible:outline-none"
                     style={{
                       opacity: isDimmed ? 0.3 : 1,
                       transition: "opacity 0.3s ease, transform 0.3s ease",

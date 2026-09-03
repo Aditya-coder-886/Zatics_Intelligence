@@ -49,15 +49,31 @@ export default function CaseStudies() {
           variants={stagger}
           className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
         >
-          {caseStudiesData.map((cs) => (
+          {caseStudiesData.length === 0 ? (
+            <p className="col-span-full text-center text-sm text-zinc-500">No case studies yet. Check back soon.</p>
+          ) : caseStudiesData.map((cs) => (
             <motion.div key={cs.id} variants={fadeUp}>
-              <div className="group relative h-full p-6 sm:p-7 rounded-2xl bg-zinc-900/50 border border-zinc-800/60 transition-all duration-400 ease-out hover:translate-y-[-4px] hover:border-transparent overflow-hidden"
+              <div
+                tabIndex={0}
+                role="group"
+                aria-label={cs.title}
+                className="group relative h-full p-6 sm:p-7 rounded-2xl bg-zinc-900/50 border border-zinc-800/60 transition-all duration-400 ease-out hover:translate-y-[-4px] hover:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 overflow-hidden"
                 onMouseEnter={(e) => {
                   const el = e.currentTarget;
                   el.style.borderColor = "rgba(16,185,129,0.3)";
                   el.style.boxShadow = "0 0 40px rgba(16,185,129,0.08)";
                 }}
                 onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "";
+                  el.style.boxShadow = "";
+                }}
+                onFocus={(e) => {
+                  const el = e.currentTarget;
+                  el.style.borderColor = "rgba(16,185,129,0.3)";
+                  el.style.boxShadow = "0 0 40px rgba(16,185,129,0.08)";
+                }}
+                onBlur={(e) => {
                   const el = e.currentTarget;
                   el.style.borderColor = "";
                   el.style.boxShadow = "";
